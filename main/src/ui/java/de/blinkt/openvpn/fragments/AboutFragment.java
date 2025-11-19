@@ -27,9 +27,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 import com.android.vending.billing.IInAppBillingService;
@@ -111,16 +108,6 @@ public class AboutFragment extends Fragment implements View.OnClickListener {
 
         TextView wv = (TextView) v.findViewById(R.id.full_licenses);
         wv.setText(Html.fromHtml(readHtmlFromAssets()));
-
-
-
-        ViewCompat.setOnApplyWindowInsetsListener(v, (view, windowInsets) ->
-                {
-                    Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
-                    view.setPadding(view.getPaddingLeft(), view.getPaddingTop(), view.getPaddingRight(), insets.bottom);
-                    return WindowInsetsCompat.CONSUMED;
-                }
-        );
         return v;
     }
 

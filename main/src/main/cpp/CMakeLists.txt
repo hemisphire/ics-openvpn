@@ -22,7 +22,7 @@ SET(OPENVPN3OSSL ON)
 SET(SSLLIBTYPE STATIC)
 SET(OPENSSL_PATH "openssl")
 
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 17)
 
 
 #add_subdirectory(lzo)
@@ -30,7 +30,6 @@ include(tools.cmake)
 include(lzo.cmake)
 include(lz4.cmake)
 include(openssl/openssl.cmake)
-add_subdirectory(fmt)
 
 if(NOT ${OPENVPN3OSSL} OR ${OPENVPN2MBED})
     add_subdirectory(mbedtls)
@@ -64,7 +63,6 @@ if (NOT ${CMAKE_LIBRARY_OUTPUT_DIRECTORY} MATCHES "build/intermediates/cmake/.*s
             openvpn3/client/ovpncli.cpp
             openvpn3/openvpn/openssl/xkey/xkey_provider.c
             openvpn3/openvpn/openssl/xkey/xkey_helper.c
-            openvpn3/openvpn/crypto/data_epoch.cpp
             ovpncli_wrap.cxx)
 
     add_library(ovpn3 SHARED ${ovpn3_SRCS})
@@ -81,12 +79,12 @@ if (NOT ${CMAKE_LIBRARY_OUTPUT_DIRECTORY} MATCHES "build/intermediates/cmake/.*s
         target_compile_definitions(ovpn3 PRIVATE
                 -DUSE_OPENSSL
                 )
-        target_link_libraries(ovpn3 crypto ssl lzo lz4 fmt)
+        target_link_libraries(ovpn3 crypto ssl lzo lz4)
     else ()
         target_compile_definitions(ovpn3 PRIVATE
                 -DUSE_MBEDTLS
                 )
-        target_link_libraries(ovpn3 mbedtls mbedx509 mbedcrypto lzo lz4 fmt)
+        target_link_libraries(ovpn3 mbedtls mbedx509 mbedcrypto lzo lz4)
     endif ()
 
     target_compile_definitions(ovpn3 PRIVATE
@@ -135,7 +133,6 @@ set(openvpn_srcs
         src/openvpn/console.c
         src/openvpn/console_builtin.c
         src/openvpn/crypto.c
-        src/openvpn/crypto_epoch.c
         src/openvpn/crypto_openssl.c
         src/openvpn/crypto_mbedtls.c
         src/openvpn/cryptoapi.c
@@ -161,19 +158,19 @@ set(openvpn_srcs
         src/openvpn/misc.c
         src/openvpn/mroute.c
         src/openvpn/mss.c
+        src/openvpn/mstats.c
         src/openvpn/mtcp.c
         src/openvpn/mtu.c
         src/openvpn/mudp.c
         src/openvpn/multi.c
-        src/openvpn/multi_io.c
         src/openvpn/ntlm.c
         src/openvpn/occ.c
         src/openvpn/openvpn.c
         src/openvpn/options.c
-        src/openvpn/options_parse.c
         src/openvpn/options_util.c
         src/openvpn/otime.c
         src/openvpn/packet_id.c
+        src/openvpn/perf.c
         src/openvpn/ping.c
         src/openvpn/pkcs11.c
         src/openvpn/pkcs11_openssl.c
@@ -184,7 +181,6 @@ set(openvpn_srcs
         src/openvpn/proxy.c
         src/openvpn/ps.c
         src/openvpn/push.c
-        src/openvpn/push_util.c
         src/openvpn/reflect_filter.c
         src/openvpn/reliable.c
         src/openvpn/route.c
@@ -194,7 +190,6 @@ set(openvpn_srcs
         src/openvpn/shaper.c
         src/openvpn/sig.c
         src/openvpn/socket.c
-        src/openvpn/socket_util.c
         src/openvpn/socks.c
         src/openvpn/ssl.c
         src/openvpn/ssl_openssl.c
@@ -209,7 +204,6 @@ set(openvpn_srcs
         src/openvpn/status.c
         src/openvpn/tls_crypt.c
         src/openvpn/tun.c
-        src/openvpn/tun_afunix.c
         src/openvpn/vlan.c
         src/openvpn/xkey_helper.c
         src/openvpn/xkey_provider.c
@@ -236,7 +230,6 @@ target_compile_definitions(openvpn PRIVATE
         -DCONFIGURE_GIT_FLAGS=\"\"
         -DTARGET_ABI=\"${ANDROID_ABI}\"
         -DOPENSSL_API_COMPAT=0x11000000L
-        -DDEFAULT_DNS_UPDOWN=\"/not/supported/on/android\"
         )
 
 if (${OPENVPN2MBED})

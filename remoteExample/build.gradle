@@ -8,9 +8,6 @@ plugins {
 }
 
 android {
-    buildFeatures {
-        buildConfig true
-    }
     compileSdkVersion 33
 
     defaultConfig {

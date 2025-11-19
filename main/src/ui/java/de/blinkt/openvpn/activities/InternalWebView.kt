@@ -22,7 +22,7 @@ import de.blinkt.openvpn.R
 import de.blinkt.openvpn.VpnProfile
 import org.json.JSONObject
 
-class InternalWebView : BaseActivity() {
+class InternalWebView : AppCompatActivity() {
 
     lateinit var webView: WebView
     lateinit var urlTextView: TextView
@@ -32,8 +32,6 @@ class InternalWebView : BaseActivity() {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.webview_internal)
-        setUpEdgeEdgeInsetsListener(getWindow().getDecorView().getRootView(), R.id.container)
-
 
         webView = findViewById(R.id.internal_webview)
         urlTextView = findViewById(R.id.url_textview)
@@ -96,7 +94,7 @@ class InternalWebView : BaseActivity() {
 
     }
 
-    override fun onNewIntent(intent: Intent) {
+    override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
 
     }

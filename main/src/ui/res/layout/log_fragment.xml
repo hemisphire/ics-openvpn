@@ -35,7 +35,6 @@
             />
 
     <ListView
-            android:clipToPadding="false"
             android:id="@android:id/list"
             android:transcriptMode="normal"
             android:layout_width="fill_parent"

@@ -7,9 +7,10 @@ package de.blinkt.openvpn.core;
 
 import android.annotation.SuppressLint;
 
+import junit.framework.Assert;
+
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.Assert;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -41,7 +42,7 @@ public class TestLogFileHandler {
         lfh.writeEscapedBytes(testUnescaped);
 
         byte[] result = byteArrayOutputStream.toByteArray();
-        Assert.assertArrayEquals(expectedEscaped, result);
+        Assert.assertTrue(Arrays.equals(expectedEscaped, result));
     }
 
     @Test

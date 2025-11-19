@@ -32,7 +32,6 @@ import de.blinkt.openvpn.R
 import de.blinkt.openvpn.VpnProfile
 import de.blinkt.openvpn.core.ConfigParser
 import de.blinkt.openvpn.core.ConfigParser.ConfigParseError
-import de.blinkt.openvpn.core.GlobalPreferences
 import de.blinkt.openvpn.core.ProfileManager
 import de.blinkt.openvpn.fragments.Utils
 import de.blinkt.openvpn.views.FileSelectLayout
@@ -216,7 +215,6 @@ class ConfigConverter : BaseActivity(), FileSelectCallback, View.OnClickListener
             ConfigParser.useEmbbedUserAuth(mResult, mEmbeddedPwFile)
 
         vpl.addProfile(mResult)
-        mResult?.addChangeLogEntry("Profile created via ConfigConverter")
         ProfileManager.saveProfile(this, mResult)
         vpl.saveProfileList(this)
         result.putExtra(VpnProfile.EXTRA_PROFILEUUID, mResult!!.uuid.toString())
@@ -620,9 +618,7 @@ class ConfigConverter : BaseActivity(), FileSelectCallback, View.OnClickListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val v  = layoutInflater.inflate(R.layout.config_converter, null)
-        setUpEdgeEdgeInsetsListener(v, R.id.root_layout_config_converter)
-        setContentView(v)
+        setContentView(R.layout.config_converter)
 
         val fab_button = findViewById<ImageButton?>(R.id.fab_save)
         if (fab_button != null) {
@@ -825,7 +821,6 @@ class ConfigConverter : BaseActivity(), FileSelectCallback, View.OnClickListener
 
     override fun onStart() {
         super.onStart()
-        checkMinimalUIDisabled()
     }
 
     private fun log(logmessage: String?) {

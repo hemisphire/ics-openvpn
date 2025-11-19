@@ -10,7 +10,6 @@ import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Build;
@@ -46,20 +45,7 @@ public class ICSOpenVPNApplication extends Application {
         mStatus = new StatusListener();
         mStatus.init(getApplicationContext());
 
-        createFirstLaunchSetting();
-
         AppRestrictions.getInstance(this).checkRestrictions(this);
-    }
-
-    private void createFirstLaunchSetting() {
-        SharedPreferences prefs = Preferences.getDefaultSharedPreferences(this);
-        long firstStart = prefs.getLong("firstStart", 0);
-        if (firstStart == 0)
-        {
-            SharedPreferences.Editor pedit = prefs.edit();
-            pedit.putLong("firstStart", System.currentTimeMillis());
-            pedit.apply();
-        }
     }
 
     @Override

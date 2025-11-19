@@ -5,8 +5,6 @@
 
 package de.blinkt.openvpn;
 
-import static de.blinkt.openvpn.core.OpenVPNService.EXTRA_START_REASON;
-
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -75,7 +73,7 @@ public class LaunchVPN extends Activity {
     public static final String EXTRA_KEY = "de.blinkt.openvpn.shortcutProfileUUID";
     public static final String EXTRA_NAME = "de.blinkt.openvpn.shortcutProfileName";
     public static final String EXTRA_HIDELOG = "de.blinkt.openvpn.showNoLogWindow";
-
+    public static final String EXTRA_START_REASON = "de.blinkt.openvpn.start_reason";
     public static final String CLEARLOG = "clearlogconnect";
 
 
@@ -201,26 +199,29 @@ public class LaunchVPN extends Activity {
         }
 
         AlertDialog.Builder builder = dialog.setPositiveButton(android.R.string.ok,
-                (dialog1, which) -> {
+                new OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
 
-                    if (type == R.string.password) {
-                        mSelectedProfile.mUsername = ((EditText) userpwlayout.findViewById(R.id.username)).getText().toString();
+                        if (type == R.string.password) {
+                            mSelectedProfile.mUsername = ((EditText) userpwlayout.findViewById(R.id.username)).getText().toString();
 
-                        String pw = ((EditText) userpwlayout.findViewById(R.id.password)).getText().toString();
-                        if (((CheckBox) userpwlayout.findViewById(R.id.save_password)).isChecked()) {
-                            mSelectedProfile.mPassword = pw;
+                            String pw = ((EditText) userpwlayout.findViewById(R.id.password)).getText().toString();
+                            if (((CheckBox) userpwlayout.findViewById(R.id.save_password)).isChecked()) {
+                                mSelectedProfile.mPassword = pw;
+                            } else {
+                                mSelectedProfile.mPassword = null;
+                                mTransientAuthPW = pw;
+                            }
+                            ProfileManager.saveProfile( LaunchVPN.this, mSelectedProfile);
+
                         } else {
-                            mSelectedProfile.mPassword = null;
-                            mTransientAuthPW = pw;
+                            mTransientCertOrPCKS12PW = entry.getText().toString();
                         }
-                        mSelectedProfile.addChangeLogEntry("saved password");
-                        ProfileManager.saveProfile( LaunchVPN.this, mSelectedProfile);
-
-                    } else {
-                        mTransientCertOrPCKS12PW = entry.getText().toString();
+                        Intent intent = new Intent(LaunchVPN.this, OpenVPNStatusService.class);
+                        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
                     }
-                    Intent intent = new Intent(LaunchVPN.this, OpenVPNStatusService.class);
-                    bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+
                 });
         dialog.setNegativeButton(android.R.string.cancel,
                 new DialogInterface.OnClickListener() {
@@ -254,7 +255,7 @@ public class LaunchVPN extends Activity {
                     if (!mhideLog && showLogWindow)
                         showLogWindow();
                     ProfileManager.updateLRU(this, mSelectedProfile);
-                    VPNLaunchHelper.startOpenVpn(mSelectedProfile, getBaseContext(), mSelectedProfileReason, true);
+                    VPNLaunchHelper.startOpenVpn(mSelectedProfile, getBaseContext(), mSelectedProfileReason);
                     finish();
                 }
             } else if (resultCode == Activity.RESULT_CANCELED) {

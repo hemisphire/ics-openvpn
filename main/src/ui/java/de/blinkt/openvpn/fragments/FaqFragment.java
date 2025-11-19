@@ -9,9 +9,6 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
@@ -199,12 +196,8 @@ public class FaqFragment extends Fragment {
 
         mRecyclerView.setAdapter(new FaqViewAdapter(getActivity(), getFAQEntries()));
 
-        Utils.applyInsetListener(v);
-
         return v;
     }
-
-
 
     private FAQEntry[] getFAQEntries() {
         Vector<FAQEntry> faqItems = new Vector<>();

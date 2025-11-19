@@ -12,26 +12,25 @@ plugins {
 }
 
 android {
+    buildToolsVersion = "33.0.1"
     buildFeatures {
         aidl = true
-        buildConfig = true
     }
     namespace = "de.blinkt.openvpn"
-    compileSdk = 36
+    compileSdk = 34
     //compileSdkPreview = "UpsideDownCake"
 
     // Also update runcoverity.sh
-    ndkVersion = "29.0.14206865"
+    ndkVersion = "25.2.9519653"
 
     defaultConfig {
         minSdk = 21
-        targetSdk = 36
+        targetSdk = 34
         //targetSdkPreview = "UpsideDownCake"
-        versionCode = 218
-        versionName = "0.7.63"
+        versionCode = 204
+        versionName = "0.7.49"
         externalNativeBuild {
             cmake {
-                //arguments+= "-DCMAKE_VERBOSE_MAKEFILE=1"
             }
         }
     }
@@ -236,11 +235,8 @@ dependencies {
     implementation(libs.androidx.core.ktx)
 
     uiImplementation(libs.android.view.material)
-    uiImplementation(libs.androidx.activity)
-    uiImplementation(libs.androidx.activity.ktx)
     uiImplementation(libs.androidx.appcompat)
     uiImplementation(libs.androidx.cardview)
-    uiImplementation(libs.androidx.viewpager2)
     uiImplementation(libs.androidx.constraintlayout)
     uiImplementation(libs.androidx.core.ktx)
     uiImplementation(libs.androidx.fragment.ktx)

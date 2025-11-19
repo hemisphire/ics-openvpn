@@ -14,11 +14,14 @@ import android.net.NetworkInfo;
 import android.net.NetworkInfo.State;
 import android.os.Handler;
 import android.os.Looper;
+import android.preference.PreferenceManager;
 
 import de.blinkt.openvpn.R;
 import de.blinkt.openvpn.core.VpnStatus.ByteCountListener;
 
 import java.util.LinkedList;
+import java.util.Objects;
+import java.util.StringTokenizer;
 
 import static de.blinkt.openvpn.core.OpenVPNManagement.pauseReason;
 
@@ -34,6 +37,7 @@ public class DeviceStateReceiver extends BroadcastReceiver implements ByteCountL
 
     // Time to wait after network disconnect to pause the VPN
     private final int DISCONNECT_WAIT = 20;
+
 
     connectState network = connectState.DISCONNECTED;
     connectState screen = connectState.SHOULDBECONNECTED;
@@ -175,16 +179,12 @@ public class DeviceStateReceiver extends BroadcastReceiver implements ByteCountL
         return (a == null) ? (b == null) : a.equals(b);
     }
 
-    public void networkStateChange(Context context) {
-        SharedPreferences prefs = Preferences.getDefaultSharedPreferences(context);
-        boolean ignoreNetworkState = prefs.getBoolean("ignorenetstate", false);
-        if (ignoreNetworkState) {
-            network = connectState.SHOULDBECONNECTED;
-            return;
-        }
 
+    public void networkStateChange(Context context) {
         NetworkInfo networkInfo = getCurrentNetworkInfo(context);
+        SharedPreferences prefs = Preferences.getDefaultSharedPreferences(context);
         boolean sendusr1 = prefs.getBoolean("netchangereconnect", true);
+
 
         String netstatestring;
         if (networkInfo == null) {

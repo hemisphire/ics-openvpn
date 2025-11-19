@@ -33,10 +33,4 @@ interface IServiceStatus {
        * Gets the traffic history
        */
        TrafficHistory getTrafficHistory();
-
-       /**
-       * Trigger reloading of a saved profile
-       */
-       oneway void notifyProfileVersionChanged(in String uuid,in int version);
-
 }

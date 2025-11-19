@@ -26,13 +26,12 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Created by arne on 09.11.16.
  */
 
-public class StatusListener implements VpnStatus.LogListener, VpnStatus.ProfileNotifyListener {
+public class StatusListener implements VpnStatus.LogListener {
     private final IStatusCallbacks mCallback = new IStatusCallbacks.Stub() {
         @Override
         public void newLogItem(LogItem item) throws RemoteException {
@@ -66,23 +65,16 @@ public class StatusListener implements VpnStatus.LogListener, VpnStatus.ProfileN
         public void connectedVPN(String uuid) throws RemoteException {
             VpnStatus.setConnectedVPNProfile(uuid);
         }
-
-        @Override
-        public void notifyProfileVersionChanged(String uuid, int version) throws RemoteException {
-            ProfileManager.notifyProfileVersionChanged(mContext, uuid, version);
-
-        }
     };
     private File mCacheDir;
-    private final StatusServiceConnection mConnection = new StatusServiceConnection();
+    private final ServiceConnection mConnection = new ServiceConnection() {
 
-    final class StatusServiceConnection implements ServiceConnection {
-        public IServiceStatus serviceStatus = null;
+
         @Override
         public void onServiceConnected(ComponentName className,
                                        IBinder service) {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
-            serviceStatus = IServiceStatus.Stub.asInterface(service);
+            IServiceStatus serviceStatus = IServiceStatus.Stub.asInterface(service);
             try {
                 /* Check if this a local service ... */
                 if (service.queryLocalInterface("de.blinkt.openvpn.core.IServiceStatus") == null) {
@@ -91,9 +83,6 @@ public class StatusListener implements VpnStatus.LogListener, VpnStatus.ProfileN
                     VpnStatus.setTrafficHistory(serviceStatus.getTrafficHistory());
                     ParcelFileDescriptor pfd = serviceStatus.registerStatusCallback(mCallback);
                     DataInputStream fd = new DataInputStream(new ParcelFileDescriptor.AutoCloseInputStream(pfd));
-
-                    /* notify the backend :openvpn process of chagnes in profiles */
-                    VpnStatus.addProfileStateListener(StatusListener.this);
 
                     short len = fd.readShort();
                     byte[] buf = new byte[65336];
@@ -114,6 +103,8 @@ public class StatusListener implements VpnStatus.LogListener, VpnStatus.ProfileN
                     if (BuildConfig.DEBUG || BuildConfig.FLAVOR.equals("skeleton")) {
                         VpnStatus.addLogListener(StatusListener.this);
                     }
+
+
                 }
 
             } catch (RemoteException | IOException e) {
@@ -124,17 +115,14 @@ public class StatusListener implements VpnStatus.LogListener, VpnStatus.ProfileN
 
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
-            serviceStatus = null;
             VpnStatus.removeLogListener(StatusListener.this);
-            VpnStatus.removeProfileStateListener(StatusListener.this);
         }
 
     };
     private Context mContext;
-    private String pkgName = "(packageName not yet set)";
 
     void init(Context c) {
-        pkgName = c.getPackageName();
+
         Intent intent = new Intent(c, OpenVPNStatusService.class);
         intent.setAction(OpenVPNService.START_SERVICE);
         mCacheDir = c.getCacheDir();
@@ -175,32 +163,24 @@ public class StatusListener implements VpnStatus.LogListener, VpnStatus.ProfileN
 
     @Override
     public void newLog(LogItem logItem) {
-        String tag = pkgName + "(OpenVPN)";
-        long logAge = System.currentTimeMillis() - logItem.getLogtime();
-        if (logAge > 5000)
-        {
-            tag += String.format(Locale.US, "[%ds ago]", logAge/1000 );
-        }
-
         switch (logItem.getLogLevel()) {
-            case INFO -> Log.i(tag, logItem.getString(mContext));
-            case DEBUG -> Log.d(tag, logItem.getString(mContext));
-            case ERROR -> Log.e(tag, logItem.getString(mContext));
-            case VERBOSE -> Log.v(tag, logItem.getString(mContext));
-            default -> Log.w(tag, logItem.getString(mContext));
+            case INFO:
+                Log.i("OpenVPN", logItem.getString(mContext));
+                break;
+            case DEBUG:
+                Log.d("OpenVPN", logItem.getString(mContext));
+                break;
+            case ERROR:
+                Log.e("OpenVPN", logItem.getString(mContext));
+                break;
+            case VERBOSE:
+                Log.v("OpenVPN", logItem.getString(mContext));
+                break;
+            case WARNING:
+            default:
+                Log.w("OpenVPN", logItem.getString(mContext));
+                break;
         }
 
-    }
-
-    @Override
-    public void notifyProfileVersionChanged(String uuid, int version, boolean changedInThisProcess) {
-        if(changedInThisProcess && mConnection.serviceStatus != null)
-        {
-            try {
-                mConnection.serviceStatus.notifyProfileVersionChanged(uuid, version);
-            } catch (RemoteException e) {
-                VpnStatus.logException(e);
-            }
-        }
     }
 }

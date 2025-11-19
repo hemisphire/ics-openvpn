@@ -105,7 +105,6 @@ class OpenSSLSpeed : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.openssl_speed)
-        setUpEdgeEdgeInsetsListener(getWindow().getDecorView().getRootView(), R.id.speed_root)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
         findViewById<View>(R.id.testSpecific).setOnClickListener { _ -> runAlgorithms(mCipher.text.toString()) }
